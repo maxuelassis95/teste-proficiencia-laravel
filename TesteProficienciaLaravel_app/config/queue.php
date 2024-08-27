@@ -106,4 +106,26 @@ return [
         'table' => 'failed_jobs',
     ],
 
+    /**
+     * Filas
+     */
+
+    'queues' => [
+
+        'pedidos' => [
+            'driver' => 'redis',
+            'queue' => 'pedidos'
+        ],
+
+        'emails' => [
+            'driver' => 'redis',
+            'queue' => 'emails'
+        ],
+
+        'emails_promocionais' => [
+            'driver' => 'redis',
+            'queue' => 'emails_promocionais'
+        ]
+    ],
+
 ];
