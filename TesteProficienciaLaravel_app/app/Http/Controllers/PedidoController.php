@@ -2,61 +2,68 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pedido;
+use Dotenv\Exception\ValidationException;
+use Exception;
 use Illuminate\Http\Request;
 
 class PedidoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+
+        try {
+
+            $validaDados = $request->validate([
+                'cliente_id' => 'required|exists:clientes,id',
+            ]);
+
+            $pedido = Pedido::create([
+                'cliente_id' => $request->input('cliente_id'),
+                'total' => 0.00,
+                'status' => 'pendente'
+            ]);
+
+            /** Logging */
+            return response()->json(['mensagem' => 'Pedido criado com sucesso. Está sendo processado...'], 201);
+
+            /* Log => evento disparado* */
+
+        }catch (ValidationException $e) {
+            
+            /** Gera Loggin */
+            return response()->json(['mensagem' => 'Dados inválidos'], 422);
+        
+        }
+
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         //

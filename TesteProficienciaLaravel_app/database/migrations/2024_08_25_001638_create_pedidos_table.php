@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreign('cliente_id')->references('id')->on('clientes');
             
             $table->decimal('total', 10, 2);
+            $table->string('status');
             $table->timestamps();
             
         });

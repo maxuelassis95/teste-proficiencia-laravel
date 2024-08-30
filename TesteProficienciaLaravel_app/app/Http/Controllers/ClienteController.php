@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cliente;
 use Illuminate\Http\Request;
 
 class ClienteController extends Controller
@@ -24,7 +25,26 @@ class ClienteController extends Controller
 
     public function show(string $id)
     {
-        //
+        
+        $cliente = Cliente::find($id);
+
+        $pedidos = $cliente->pedidos()->get();
+
+        $response = '';
+
+        if ($cliente) {
+            $response = response()->json([            
+                $cliente,
+                $pedidos,
+            ], 200);
+        } else {
+            $response = response()->json([
+                'msg' => 'Erro'
+            ], 200);
+        }
+        
+        return $response;
+
     }
 
     public function edit(string $id)

@@ -1,23 +1,23 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Jobs\Pedidos;
 
-use App\Models\Pedido;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class ProcessarPedido implements ShouldQueue
+class EnviarEmailConfirmacao implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $pedido;
-
-    public function __construct(Pedido $pedido)
+    /**
+     * Create a new job instance.
+     */
+    public function __construct()
     {
-        $this->pedido = $pedido;
+        //
     }
 
     /**
