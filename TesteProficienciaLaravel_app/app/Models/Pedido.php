@@ -13,6 +13,7 @@ class Pedido extends Model
         'cliente_id',
         'total',
         'status',
+        'nota'
     ];
 
     public function cliente()

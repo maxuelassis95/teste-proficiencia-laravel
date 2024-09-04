@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\Pedidos\VerificarExistenciaProdutos;
 use App\Models\Pedido;
 use Dotenv\Exception\ValidationException;
 use Exception;
@@ -32,17 +33,21 @@ class PedidoController extends Controller
             $pedido = Pedido::create([
                 'cliente_id' => $request->input('cliente_id'),
                 'total' => 0.00,
-                'status' => 'pendente'
+                'status' => 'pendente',
+                'nota' => 'pedido iniciado'
             ]);
 
-            /** Logging */
-            return response()->json(['mensagem' => 'Pedido criado com sucesso. Está sendo processado...'], 201);
+            $produtos = $request->produtos;
 
             /* Log => evento disparado* */
+            VerificarExistenciaProdutos::dispatch($pedido, $produtos)->onQueue('pedidos');
+
+            /** Log */
+            return response()->json(['mensagem' => 'Pedido criado. Aguarde enquanto está sendo processado.'], 201);
 
         }catch (ValidationException $e) {
             
-            /** Gera Loggin */
+            /** Gera Log */
             return response()->json(['mensagem' => 'Dados inválidos'], 422);
         
         }

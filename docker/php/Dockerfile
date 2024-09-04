@@ -18,25 +18,48 @@ RUN apt-get update && apt-get install -y \
     curl \
     libzip-dev \
     apt-utils \
-    libonig-dev
+    libonig-dev \
+    supervisor \
+    && docker-php-ext-install gd \
+    && docker-php-ext-install pcntl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instala o Redis via PECL
+RUN pecl install redis \
+    && docker-php-ext-enable redis
 
 RUN docker-php-ext-install zip pdo_mysql mbstring exif
 RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/
 RUN docker-php-ext-install gd
 
-RUN mkdir -p /usr/src/php/ext/redis; \
-	curl -fsSL https://pecl.php.net/get/redis --ipv4 | tar xvz -C "/usr/src/php/ext/redis" --strip 1; \
-	docker-php-ext-install redis;
+# Cria o usuário e grupo antes de usar chown
+RUN groupadd -g 1000 laravel && \
+    useradd -u 1000 -ms /bin/bash -g laravel user
 
+# Cria os diretórios e ajusta permissões
+RUN mkdir -p /var/log/supervisor /var/run && \
+    chown -R user:laravel /var/log/supervisor /var/run && \
+    touch /var/log/supervisor/supervisord.log && \
+    chmod 777 /var/log/supervisor/supervisord.log
+
+# Ajusta permissões para o diretório do projeto
+RUN chown -R user:laravel /var/www
+
+# Instala o Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-RUN groupadd -g 1000 laravel
-RUN useradd -u 1000 -ms /bin/bash -g laravel user
-
+# Copia o código e ajusta permissões
 COPY --chown=user:laravel . /var/www
+
+# Copia os arquivos de configuração do Supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisor.conf
+COPY horizon.conf /etc/supervisor/conf.d/horizon.conf
 
 USER user
 
 EXPOSE 9001
 
-CMD ["php-fpm"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+
+
+
