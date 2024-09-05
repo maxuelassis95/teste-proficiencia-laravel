@@ -29,19 +29,22 @@ class VerificarEstoqueProdutos implements ShouldQueue
     {
         
         try{
-            Log::info("Iniciando o sleep verifica estoque produtos");
-            sleep(8);
-            Log::info('Termiando o sleep verifica estoque produtos');
+            sleep(8); // retirar na limpeza de código
 
+            Log::info('Iniciando a verificação de estoque...');
             $this->verificaEstoque();
 
         } catch(\Exception $e) {
-            //log erro
+            Log::error('Houve um erro ao verificar estoque dos produtos no banco de dados. ' . 
+            $e->getMessage());        
         }
 
     }
 
     protected function verificaEstoque() {
+
+        $estoqueInsuficiente = false;
+        $produtoSemEstoque = null;
         
         foreach($this->produtos as $produto) {
 
@@ -49,15 +52,18 @@ class VerificarEstoqueProdutos implements ShouldQueue
 
             if ($prod && ($prod->quantidade < $produto['quantidade'])) {
 
-                /** log error, produto com quantidade insuficiente */
-                PedidoHelper::atualizaPedido($this->pedido, 'erro', 
-                'Erro: estoque insuficiente para o produto #' . $produto['id'], []);
-
-                return;
+                Log::error('Erro: estoque insuficiente par o produto: #' . $produto['id']);
+                $estoqueInsuficiente = true;
+                $produtoSemEstoque = $produto['id'];
+                break;
             }
+        }
 
-           PedidoHelper::atualizaPedido($this->pedido, 'processando', 'Todos produtos em estoque', []);
-
+        if($estoqueInsuficiente) {
+            PedidoHelper::atualizaPedido($this->pedido, 'erro', 
+                'Erro: estoque insuficiente para o produto #' . $produtoSemEstoque['id'], []);
+        } else {
+            PedidoHelper::atualizaPedido($this->pedido, 'processando', 'Todos produtos em estoque', []);
         }
 
     }

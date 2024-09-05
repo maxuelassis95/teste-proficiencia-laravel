@@ -29,18 +29,17 @@ class VerificarExistenciaProdutos implements ShouldQueue
     {
 
         if (empty($this->pedido)) {
-            /**log erro */
+            Log::error("Erro: Pedido não encontrado");
         }
         
         try {
-            Log::info("Iniciando o sleep verifica existencia produtos");
-            sleep(5);
-            Log::info('Terminando o sleep verifica existencia produtos');
-
+            sleep(5); // retirar na limpeza de código
+            Log::info('Iniciando a verificação de produtos...');
             $this->verificarProdutos();
 
         } catch (\Exception $e) {
-            //Log (['mensagem' => 'Erro ao verificar estoque'], 422);
+            Log::error("Erro: Houve um erro ao verificar a disponibilidade dos produtos no sistema. " . 
+            $e->getMessage());
         }
 
     }
@@ -56,17 +55,17 @@ class VerificarExistenciaProdutos implements ShouldQueue
 
             if(!empty($verificaProdutosNaoEcontrados)) {
                 
-                // log erro
+                Log::error('Erro: alguns produtos do pedido não estão mais disponiveis em nosso sistema');
                 PedidoHelper::atualizaPedido($this->pedido, 'Erro no pedido', 
-                'Erro: alguns produtos do pedido não existem em nossa base de dados', []);
+                'Erro: alguns produtos do pedido não estão mais disponiveis em nosso sistema', []);
 
 
             } else {
                 
-                Log::info('Sucesso: Todos os produtos estão em nosso sistema');
-                PedidoHelper::atualizaPedido($this->pedido, 'processando...', 'Todos produtos encontrados', []);                
+                Log::info('Sucesso: Todos os produtos estão disponiveis em nosso sistema, atualizando status do pedido');
+                PedidoHelper::atualizaPedido($this->pedido, 'processando...', 'Todos produtos disponiveis', []);                
 
-                // log disparando job
+                Log::info('Disparando Job: VerificarEstoqueProdutos');
                 VerificarEstoqueProdutos::dispatch($this->pedido, $this->produtos)->onQueue('pedidos');
             }
     }
