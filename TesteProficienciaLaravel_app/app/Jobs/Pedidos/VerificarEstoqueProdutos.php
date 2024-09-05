@@ -29,9 +29,9 @@ class VerificarEstoqueProdutos implements ShouldQueue
     {
         
         try{
-            Log::info("Inicjando o sleep verifica estoque produtos");
+            Log::info("Iniciando o sleep verifica estoque produtos");
             sleep(8);
-            Log::info('Inicjando o sleep verifica estoque produtos');
+            Log::info('Termiando o sleep verifica estoque produtos');
 
             $this->verificaEstoque();
 

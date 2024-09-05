@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nome');
             $table->string('descricao');
             $table->decimal('preco', 10,2);
+            $table->integer('quantidade');
             $table->timestamps();
         });
     }
