@@ -19,6 +19,8 @@ class VerificarExistenciaProdutos implements ShouldQueue
     protected $pedido;
     protected $produtos;
 
+    public $tries = 5;
+
     public function __construct(Pedido $pedido, array $produtos)
     {
         $this->pedido = $pedido;

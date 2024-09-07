@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Pedidos;
 
+use App\Models\Pedido;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -12,19 +13,18 @@ class GerarFaturaPedido implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * Create a new job instance.
-     */
-    public function __construct()
+    protected $pedido, $produtos; 
+    public $tries = 5;
+
+    public function __construct(Pedido $pedido, array $produtos)
     {
-        //
+        $this->pedido = $pedido;
+        $this->produtos = $produtos;
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
-        //
+        sleep(5);
     }
+
 }
