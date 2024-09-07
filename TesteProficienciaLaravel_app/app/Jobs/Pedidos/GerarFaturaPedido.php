@@ -26,7 +26,7 @@ class GerarFaturaPedido implements ShouldQueue
         $this->produtos = $produtos;
     }
 
-    public function handle()
+    public function handle(): void
     {
         sleep(5);
 

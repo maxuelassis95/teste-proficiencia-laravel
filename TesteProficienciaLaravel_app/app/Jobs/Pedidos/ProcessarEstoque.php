@@ -25,7 +25,7 @@ class ProcessarEstoque implements ShouldQueue
         $this->produtos = $produtos;
     }
 
-    public function handle()
+    public function handle(): void
     { 
         Log::info('Iniciando o processamento de estoque para o pedido #' . $this->pedido->id);
 

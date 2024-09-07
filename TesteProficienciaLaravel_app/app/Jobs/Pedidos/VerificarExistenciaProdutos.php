@@ -27,7 +27,7 @@ class VerificarExistenciaProdutos implements ShouldQueue
         $this->produtos = $produtos;
     }
 
-    public function handle()
+    public function handle(): void
     {
 
         if (empty($this->pedido)) {

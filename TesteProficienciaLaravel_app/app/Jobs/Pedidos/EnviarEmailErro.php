@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Jobs\Pedidos;
 
 use App\Models\Pedido;
 use Illuminate\Bus\Queueable;
@@ -9,20 +9,19 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class EnviarEmailConfirmacao implements ShouldQueue
+class EnviarEmailErro implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $pedido;
+    protected $pedido, $produtos;
+    public $tries = 3;
 
-    public function __construct(Pedido $pedido)
+    public function __construct(Pedido $pedido, array $produtos)
     {
-       $this->pedido = $pedido;
+        $this->pedido = $pedido;
+        $this->produtos = $produtos;
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         //

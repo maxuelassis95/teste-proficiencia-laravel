@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Jobs\Promocoes;
 
-use App\Models\Pedido;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -13,11 +12,12 @@ class EnviarEmailPromocional implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $pedido;
-
-    public function __construct(Pedido $pedido)
+    /**
+     * Create a new job instance.
+     */
+    public function __construct()
     {
-        $this->pedido = $pedido;
+        //
     }
 
     /**
