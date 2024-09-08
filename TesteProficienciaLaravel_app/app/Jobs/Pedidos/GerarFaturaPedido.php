@@ -79,7 +79,9 @@ class GerarFaturaPedido implements ShouldQueue
             'Todas etapas foram concluidas, aguardando pagamento',
             ['total' => $total]
         );
-        
+
+        EnviarEmailSucesso::dispatch($this->pedido)->onQueue('emails_pedidos');
+
         Log::info('Total do pedido atualizado para: R$ ' . $total);
     }
 }

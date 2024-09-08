@@ -2,6 +2,7 @@
 
 namespace App\Mail\Promocionais;
 
+use App\Models\Pedido;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -13,12 +14,12 @@ class EnviaPromocoesMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct()
+
+    protected $assunto;
+
+    public function __construct(string $assunto)
     {
-        //
+        $this->assunto = $assunto;
     }
 
     /**
@@ -27,7 +28,7 @@ class EnviaPromocoesMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Envia Promocoes Mail',
+            subject: $this->assunto,
         );
     }
 

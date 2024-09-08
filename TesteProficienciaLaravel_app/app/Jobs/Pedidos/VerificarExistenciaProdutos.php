@@ -61,6 +61,8 @@ class VerificarExistenciaProdutos implements ShouldQueue
                 PedidoHelper::atualizaPedido($this->pedido, 'Erro no pedido', 
                 'Erro: alguns produtos do pedido não estão mais disponiveis em nosso sistema', []);
 
+                Log::info('Disparando job: EnviarEmailErros');
+                EnviarEmailErro::dispatch($this->pedido)->onQueue('emails_pedidos');
 
             } else {
                 

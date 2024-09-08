@@ -30,7 +30,7 @@ class VerificarEstoqueProdutos implements ShouldQueue
     {
         
         try{
-            sleep(8); // retirar na limpeza de código
+            sleep(8); 
 
             Log::info('Iniciando a verificação de estoque...');
             $this->verificaEstoque();
@@ -65,6 +65,9 @@ class VerificarEstoqueProdutos implements ShouldQueue
             Log::error('Erro: estoque insuficiente para o produto #' . $produtoSemEstoque['id']);
             PedidoHelper::atualizaPedido($this->pedido, 'erro', 
                 'Erro: estoque insuficiente para o produto #' . $produtoSemEstoque['id'], []);
+
+            Log::info('Email de erro ao verificqr prosutos sendo enviaso');
+            EnviarEmailErro::dispatch($this->pedido)->onQueue('emails_pedidos');
         
         } else {
 

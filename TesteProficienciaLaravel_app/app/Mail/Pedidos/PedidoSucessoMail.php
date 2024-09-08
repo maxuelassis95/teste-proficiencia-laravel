@@ -2,6 +2,7 @@
 
 namespace App\Mail\Pedidos;
 
+use App\Models\Pedido;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -13,12 +14,11 @@ class PedidoSucessoMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct()
+    protected $pedido;
+
+    public function __construct(Pedido $pedido)
     {
-        //
+        $this->pedido = $pedido;
     }
 
     /**
@@ -27,7 +27,7 @@ class PedidoSucessoMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Pedido Sucesso Mail',
+            subject: 'Parabéns, seu pedido confirmado com sucesso.',
         );
     }
 
@@ -38,6 +38,7 @@ class PedidoSucessoMail extends Mailable
     {
         return new Content(
             markdown: 'emails.pedido.pedido_sucesso',
+            with: (['pedido' => $this->pedido])
         );
     }
 

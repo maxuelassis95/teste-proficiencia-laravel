@@ -182,7 +182,7 @@ return [
     'defaults' => [
         'supervisor-1' => [
             'connection' => 'redis',
-            'queue' => ['default', 'pedidos'],
+            'queue' => ['default', 'pedidos', 'emails_pedidos', 'emails_promocionais'],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
             'maxProcesses' => 1,

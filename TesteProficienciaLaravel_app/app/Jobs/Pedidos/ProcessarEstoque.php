@@ -34,6 +34,9 @@ class ProcessarEstoque implements ShouldQueue
         } catch (\Exception $e) {
             Log::error('Erro ao processar o estoque para o pedido #' . $this->pedido->id . ': ' . $e->getMessage());
             PedidoHelper::atualizaPedido($this->pedido, 'erro', 'Erro no processamento de estoque', []);
+
+            Log::info('Disparando job: EnviarEmailErros');
+            EnviarEmailErro::dispatch($this->pedido)->onQueue('emails_pedidos');
         }
     }
 
