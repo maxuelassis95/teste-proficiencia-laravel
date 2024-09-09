@@ -13,7 +13,7 @@ class PedidoController extends Controller
 
     public function index()
     {
-        //
+        return response()->view(['admin.pages.pedidos', 200]);
     }
 
     public function create()
