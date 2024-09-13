@@ -7,13 +7,49 @@ use App\Models\Pedido;
 use Dotenv\Exception\ValidationException;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class PedidoController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        return response()->view(['admin.pages.pedidos', 200]);
+
+          // Cache para os pedidos dos últimos 7 dias
+          if (!$request->has('cliente') && !$request->has('status') && !$request->has('data_inicial') && !$request->has('data_final')) {
+            $pedidos = Cache::remember('pedidos_ultimos_7_dias', 60 * 60, function () {
+                return Pedido::with('cliente')
+                    ->where('created_at', '>=', now()->subDays(7))
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(10);
+            });
+        } else {
+            //Consulta otimizada com filtros aplicados
+            $query = Pedido::with('cliente'); //Eager Loading do relacionamento 'cliente'
+
+            if ($request->filled('cliente')) {
+                $query->whereHas('cliente', function($q) use ($request) {
+                    $q->where('nome', 'like', '%' . $request->cliente . '%');
+                });
+            }
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            if ($request->filled('data_inicial')) {
+                $query->whereDate('created_at', '>=', $request->data_inicial);
+            }
+
+            if ($request->filled('data_final')) {
+                $query->whereDate('created_at', '<=', $request->data_final);
+            }
+
+            // Ordenação por data de criação e paginação
+            $pedidos = $query->orderBy('created_at', 'desc')->paginate(10);
+        }
+
+        return view('admin.pages.pedidos', ['pedidos' => $pedidos]);
     }
 
     public function create()

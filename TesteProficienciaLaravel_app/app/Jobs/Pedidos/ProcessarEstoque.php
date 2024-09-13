@@ -49,7 +49,7 @@ class ProcessarEstoque implements ShouldQueue
 
                 $novaQuantidade = $produtoQueVaiSofrerBaixa->quantidade - $produto['quantidade'];
 
-                // Garantindo que a nova quantidade não será negativa (extra segurança)
+                // Garante que a nova quantidade não será negativa (extra segurança)
                 if ($novaQuantidade < 0) {
                     throw new \Exception('Estoque insuficiente para o produto #' . $produto['id']);
                 }

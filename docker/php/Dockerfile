@@ -37,8 +37,8 @@ RUN groupadd -g 1000 laravel && \
     useradd -u 1000 -ms /bin/bash -g laravel user
 
 # Cria os diretórios e ajusta permissões
-RUN mkdir -p /var/log/supervisor /var/run && \
-    chown -R user:laravel /var/log/supervisor /var/run && \
+RUN mkdir -p /var/log/supervisor /var/run /var/www/storage /var/www/bootstrap/cache && \
+    chown -R user:laravel /var/log/supervisor /var/run /var/www/storage /var/www/bootstrap/cache && \
     touch /var/log/supervisor/supervisord.log && \
     chmod 777 /var/log/supervisor/supervisord.log
 

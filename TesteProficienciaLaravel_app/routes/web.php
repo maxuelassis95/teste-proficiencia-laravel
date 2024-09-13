@@ -8,3 +8,4 @@ Route::get('/', function () {
 });
 
 Route::get('/pedidos', [PedidoController::class, 'index'])->name('pedidos.index');
+Route::get('/pedidos/{id}', [PedidoController::class, 'show'])->name('pedidos.show');
