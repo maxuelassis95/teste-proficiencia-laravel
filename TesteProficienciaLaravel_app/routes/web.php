@@ -7,5 +7,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
+Route::get('/horizon', function() {
+    return redirect('/horizon');
+})->name('horizon');
+
+
 Route::get('/pedidos', [PedidoController::class, 'index'])->name('pedidos.index');
 Route::get('/pedidos/{id}', [PedidoController::class, 'show'])->name('pedidos.show');

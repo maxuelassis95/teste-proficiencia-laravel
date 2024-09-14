@@ -20,8 +20,13 @@
                         <a class="nav-link active" aria-current="page" href="#">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Pedidos</a>
+                        <a class="nav-link" href="{{ route('pedidos.index') }}">Pedidos</a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('horizon') }}">Gerenciar filas (Laravel Horizon)</a>
+                    </li>
+
                 </ul>
             </div>
         </div>

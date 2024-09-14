@@ -15,21 +15,24 @@ class PedidoController extends Controller
 
     public function index(Request $request)
     {
+        // Vai ser usado para passar a pagina da paginação, e realizar o cache de forma correta
+        $pagina = $request->input('page', 1);
 
-          // Cache para os pedidos dos últimos 7 dias
-          if (!$request->has('cliente') && !$request->has('status') && !$request->has('data_inicial') && !$request->has('data_final')) {
-            $pedidos = Cache::remember('pedidos_ultimos_7_dias', 60 * 60, function () {
+        // Cache para os pedidos dos últimos 7 dias
+        if (!$request->has('cliente') && !$request->has('status') && !$request->has('data_inicial') && !$request->has('data_final')) {
+            $pedidos = Cache::remember("pedidos_ultimos_7_dias_pagina_{$pagina}", 60 * 60, function () {
                 return Pedido::with('cliente')
                     ->where('created_at', '>=', now()->subDays(7))
                     ->orderBy('created_at', 'desc')
                     ->paginate(10);
             });
         } else {
+
             //Consulta otimizada com filtros aplicados
             $query = Pedido::with('cliente'); //Eager Loading do relacionamento 'cliente'
 
             if ($request->filled('cliente')) {
-                $query->whereHas('cliente', function($q) use ($request) {
+                $query->whereHas('cliente', function ($q) use ($request) {
                     $q->where('nome', 'like', '%' . $request->cliente . '%');
                 });
             }
@@ -48,7 +51,6 @@ class PedidoController extends Controller
 
             // Ordenação por data de criação e paginação
             $pedidos = $query->orderBy('created_at', 'desc')->paginate(10);
-
         }
 
         return view('admin.pages.pedidos', ['pedidos' => $pedidos]);
@@ -81,13 +83,10 @@ class PedidoController extends Controller
             VerificarExistenciaProdutos::dispatch($pedido, $produtos)->onQueue('pedidos');
 
             return response()->json(['mensagem' => 'Pedido criado. Aguarde enquanto está sendo processado.'], 201);
-
-        }catch (ValidationException $e) {
+        } catch (ValidationException $e) {
             Log::error('Houve um erro ao tentar criar o pedido: ' . $e->getMessage());
             return response()->json(['mensagem' => 'Dados inválidos'], 422);
-        
         }
-
     }
 
     public function show(string $id)
