@@ -8,6 +8,7 @@ use Dotenv\Exception\ValidationException;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class PedidoController extends Controller
 {
@@ -47,6 +48,7 @@ class PedidoController extends Controller
 
             // Ordenação por data de criação e paginação
             $pedidos = $query->orderBy('created_at', 'desc')->paginate(10);
+
         }
 
         return view('admin.pages.pedidos', ['pedidos' => $pedidos]);
@@ -75,15 +77,13 @@ class PedidoController extends Controller
 
             $produtos = $request->produtos;
 
-            /* Log => evento disparado* */
+            Log::info("Dispando job: VerificarExistenciaProdutos");
             VerificarExistenciaProdutos::dispatch($pedido, $produtos)->onQueue('pedidos');
 
-            /** Log */
             return response()->json(['mensagem' => 'Pedido criado. Aguarde enquanto está sendo processado.'], 201);
 
         }catch (ValidationException $e) {
-            
-            /** Gera Log */
+            Log::error('Houve um erro ao tentar criar o pedido: ' . $e->getMessage());
             return response()->json(['mensagem' => 'Dados inválidos'], 422);
         
         }
