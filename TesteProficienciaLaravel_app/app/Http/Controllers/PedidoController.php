@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Jobs\Pedidos\VerificarExistenciaProdutos;
 use App\Models\Pedido;
 use Dotenv\Exception\ValidationException;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -15,46 +14,77 @@ class PedidoController extends Controller
 
     public function index(Request $request)
     {
-        // Vai ser usado para passar a pagina da paginação, e realizar o cache de forma correta
+        // Vai ser usado para passar a página da paginação, e realizar o cache de forma correta
         $pagina = $request->input('page', 1);
-
+        Log::info('Página de paginação solicitada: ' . $pagina);
+    
         // Cache para os pedidos dos últimos 7 dias
         if (!$request->has('cliente') && !$request->has('status') && !$request->has('data_inicial') && !$request->has('data_final')) {
-            $pedidos = Cache::remember("pedidos_ultimos_7_dias_pagina_{$pagina}", 60 * 60, function () {
+    
+            $cacheKey = "pedidos_ultimos_7_dias_pagina_{$pagina}";
+            Log::info("Chave de cache gerada para pedidos sem filtros: {$cacheKey}");
+    
+            $pedidos = Cache::remember($cacheKey, 60 * 60, function () use ($pagina, $cacheKey) {
+                Log::info("Cache não encontrado para chave {$cacheKey}. Realizando consulta ao banco de dados...");
                 return Pedido::with('cliente')
                     ->where('created_at', '>=', now()->subDays(7))
                     ->orderBy('created_at', 'desc')
                     ->paginate(10);
             });
+    
+            Log::info("Pedidos sem filtro carregados para a página {$pagina}");
+    
         } else {
-
-            //Consulta otimizada com filtros aplicados
-            $query = Pedido::with('cliente'); //Eager Loading do relacionamento 'cliente'
-
-            if ($request->filled('cliente')) {
-                $query->whereHas('cliente', function ($q) use ($request) {
-                    $q->where('nome', 'like', '%' . $request->cliente . '%');
-                });
-            }
-
-            if ($request->filled('status')) {
-                $query->where('status', $request->status);
-            }
-
-            if ($request->filled('data_inicial')) {
-                $query->whereDate('created_at', '>=', $request->data_inicial);
-            }
-
-            if ($request->filled('data_final')) {
-                $query->whereDate('created_at', '<=', $request->data_final);
-            }
-
-            // Ordenação por data de criação e paginação
-            $pedidos = $query->orderBy('created_at', 'desc')->paginate(10);
+            // Filtros aplicados
+            Log::info('Filtros aplicados: ' . json_encode($request->all()));
+    
+            // Cria chave de cache específica para cada filtro
+            $cacheKey = 'pedidos_' . md5(serialize($request->all())) . "_pagina_{$pagina}";
+            Log::info("Chave de cache gerada para pedidos com filtros: {$cacheKey}");
+    
+            $pedidos = Cache::remember($cacheKey, 60 * 60, function () use ($request, $cacheKey) {
+                Log::info("Cache não encontrado para chave {$cacheKey}. Realizando consulta ao banco de dados com filtros...");
+    
+                $query = Pedido::with(['cliente']); // aplicandoeager loading
+    
+                // Filtro por cliente
+                if ($request->filled('cliente')) {
+                    $query->whereHas('cliente', function ($q) use ($request) {
+                        $q->where('nome', 'like', '%' . $request->cliente . '%');
+                    });
+                    Log::info("Filtro aplicado por cliente: " . $request->cliente);
+                }
+    
+                // Filtro por status
+                if ($request->filled('status')) {
+                    $query->where('status', $request->status);
+                    Log::info("Filtro aplicado por status: " . $request->status);
+                }
+    
+                // Filtro por data inicial
+                if ($request->filled('data_inicial')) {
+                    $query->whereDate('created_at', '>=', $request->data_inicial);
+                    Log::info("Filtro aplicado por data inicial: " . $request->data_inicial);
+                }
+    
+                // Filtro por data final
+                if ($request->filled('data_final')) {
+                    $query->whereDate('created_at', '<=', $request->data_final);
+                    Log::info("Filtro aplicado por data final: " . $request->data_final);
+                }
+    
+                // Ordenação por data de criação e paginação
+                return $query->orderBy('created_at', 'desc')->paginate(10);
+            });
+    
+            Log::info("Pedidos com filtros carregados para a página {$pagina}");
         }
-
+    
+        //Retorna a view com os pedidos
+        Log::info("Renderizando a view de pedidos com os dados carregados.");
         return view('admin.pages.pedidos', ['pedidos' => $pedidos]);
     }
+    
 
     public function create()
     {
