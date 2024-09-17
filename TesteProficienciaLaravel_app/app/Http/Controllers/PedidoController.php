@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CacheHelper;
 use App\Jobs\Pedidos\VerificarExistenciaProdutos;
 use App\Models\Pedido;
 use Dotenv\Exception\ValidationException;
@@ -109,7 +110,12 @@ class PedidoController extends Controller
 
             $produtos = $request->produtos;
 
+            // Limpando os caches após novo pedido ser criado
+            CacheHelper::limpaCache();
+
             Log::info("Dispando job: VerificarExistenciaProdutos");
+
+            // Disparando primeiro job que vai verificar se todos produtos do pedido existem
             VerificarExistenciaProdutos::dispatch($pedido, $produtos)->onQueue('pedidos');
 
             return response()->json(['mensagem' => 'Pedido criado. Aguarde enquanto está sendo processado.'], 201);
