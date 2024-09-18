@@ -1,5 +1,3 @@
-Análise toda a minha documentação, está boa? 
-
 # Instruções para Rodar o Projeto
 
 ## Etapas para Rodar o Sistema:
