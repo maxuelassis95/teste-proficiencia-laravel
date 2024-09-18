@@ -8,7 +8,7 @@
 2. **Clone o projeto para o diretório criado:**
    - Utilize o comando abaixo e insira sua senha do GitHub se solicitado:
      ```bash
-     git clone https://github.com/seu_usuario/seu_repositorio.git
+     git clone https://github.com/maxuelassis95/teste-proficiencia-laravel.git
      ```
 
 3. **Copie o arquivo `.env.example` para `.env`:**
