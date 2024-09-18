@@ -27,6 +27,10 @@
                         <a class="nav-link" href="{{ route('horizon') }}">Gerenciar filas (Laravel Horizon)</a>
                     </li>
 
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('telescope') }}">Laravel Telescope</a>
+                    </li>
+
                 </ul>
             </div>
         </div>
