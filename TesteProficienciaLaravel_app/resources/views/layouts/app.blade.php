@@ -31,6 +31,10 @@
                         <a class="nav-link" href="{{ route('telescope') }}">Laravel Telescope</a>
                     </li>
 
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('logout') }}">Sair</a>
+                    </li>
+
                 </ul>
             </div>
         </div>
